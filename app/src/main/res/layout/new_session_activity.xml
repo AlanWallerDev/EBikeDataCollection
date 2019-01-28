@@ -12,32 +12,42 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="40dp"
         android:text="Subject Info"
         android:textSize="25dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="38dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/nameInputView"
         android:layout_width="wrap_content"
         android:layout_height="37dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="52dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="111dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/descView" />
 
     <EditText
         android:id="@+id/ageInputView"
         android:layout_width="wrap_content"
         android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="166dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.527"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameInputView" />
 
     <TextView
         android:id="@+id/nameView"
@@ -82,9 +92,15 @@
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:text="Start"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="429dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/heightInputView" />
 
     <TextView
         android:id="@+id/sexView"
@@ -116,25 +132,37 @@
         android:id="@+id/heightInputView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="number"
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="375dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weightInput" />
 
     <Spinner
         android:id="@+id/sexSpinner"
         android:layout_width="221dp"
         android:layout_height="29dp"
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="241dp" />
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ageInputView" />
 
     <EditText
         android:id="@+id/weightInput"
         android:layout_width="wrap_content"
         android:layout_height="43dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:inputType="number"
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="304dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sexSpinner" />
 
 </android.support.constraint.ConstraintLayout>
