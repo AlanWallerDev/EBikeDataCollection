@@ -19,7 +19,7 @@ public class NewSessionActivity extends AppCompatActivity {
         final EditText nameText = (EditText) findViewById(R.id.nameInputView);
         final EditText ageText = (EditText) findViewById(R.id.ageInputView);
         final EditText weightText = (EditText) findViewById(R.id.weightInput);
-        EditText heightText = (EditText) findViewById(R.id.heightInputView);
+        final EditText heightText = (EditText) findViewById(R.id.heightInputView);
         final Spinner sexSpinner = (Spinner) findViewById(R.id.sexSpinner);
         //populate the sex spinner with the sex_array string array
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -31,11 +31,16 @@ public class NewSessionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(NewSessionActivity.this, SessionActivity.class);
-                intent.putExtra("SUBJECT_NAME", nameText.getText().toString());
-                intent.putExtra("SUBJECT_AGE", ageText.getText().toString());
-                intent.putExtra("SUBJECT_WEIGHT", weightText.getText().toString());
-                intent.putExtra("SUBJECT_SEX", sexSpinner.getSelectedItem().toString());
-                startActivity(intent);
+                if(sexSpinner.getSelectedItem() != null && !(nameText.getText().toString().equals(""))&& !(ageText.getText().toString().equals(""))&& !(weightText.getText().toString().equals(""))&& !(heightText.getText().toString().equals(""))) {
+                    intent.putExtra("SUBJECT_NAME", nameText.getText().toString());
+                    intent.putExtra("SUBJECT_AGE", ageText.getText().toString());
+                    intent.putExtra("SUBJECT_WEIGHT", weightText.getText().toString());
+                    intent.putExtra("SUBJECT_HEIGHT", heightText.getText().toString());
+                    intent.putExtra("SUBJECT_SEX", sexSpinner.getSelectedItem().toString());
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(NewSessionActivity.this, "All Fields Must Be Filled", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
