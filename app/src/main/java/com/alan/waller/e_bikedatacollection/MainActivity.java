@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         newSesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, new_session_activity.class);
+                Intent intent = new Intent(MainActivity.this, NewSessionActivity.class);
                 startActivity(intent);
             }
         });
