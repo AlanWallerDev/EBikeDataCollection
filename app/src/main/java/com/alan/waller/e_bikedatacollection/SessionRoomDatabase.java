@@ -8,7 +8,7 @@ import android.support.annotation.*;
 
 @Database(entities = {Session.class}, version = 1)
 public abstract class SessionRoomDatabase extends RoomDatabase {
-    
+
     public abstract SessionDao sessionDao();
     private static SessionRoomDatabase INSTANCE;
 
