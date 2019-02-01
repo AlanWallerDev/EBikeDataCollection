@@ -12,7 +12,7 @@ public interface SessionDao {
     @Delete
     void delete(Session session);
 
-    @Query("SELECT * FROM Session ORDER BY sessionDate ASC")
+    @Query("SELECT * FROM Session ORDER BY sid ASC")
     LiveData<List<Session>> getAll();
 
     @Update

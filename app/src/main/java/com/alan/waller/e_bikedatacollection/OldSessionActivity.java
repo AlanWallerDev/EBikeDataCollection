@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.List;
 
@@ -22,8 +23,9 @@ public class OldSessionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.old_sessions_activity);
-
+        Log.d("OldSession", "created");
         RecyclerView rv =(RecyclerView) findViewById(R.id.recyclerview);
+        rv.hasFixedSize();
 
         sessionRecyclerViewAdapter = new SessionRecyclerViewAdapter(this);
         rv.setAdapter(sessionRecyclerViewAdapter);
@@ -34,6 +36,7 @@ public class OldSessionActivity extends AppCompatActivity {
         sessionViewModel.getAllSessions().observe(this, new Observer<List<Session>>() {
             @Override
             public void onChanged(@Nullable List<Session> sessions) {
+                Log.d("OldSessions", "GetAllSessions Ran");
                 sessionRecyclerViewAdapter.setSessions(sessions);
             }
         });

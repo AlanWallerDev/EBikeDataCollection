@@ -2,6 +2,7 @@ package com.alan.waller.e_bikedatacollection;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
 
     }
+    private final String TAG = "SRVA";
     private final LayoutInflater mInflater;
     private List<Session> sessionList; //
 
@@ -33,6 +35,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
     @Override
     public void onBindViewHolder(SessionViewHolder holder, int position) {
+        Log.d(TAG, "OnBindViewHolder Ran");
         if(sessionList != null){
             Session current = sessionList.get(position);
             holder.sessionItemView.setText(current.getSubjectName());

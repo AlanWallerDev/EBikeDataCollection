@@ -7,7 +7,7 @@
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/darker_gray"
+        android:background="@android:color/white"
         xmlns:tools="http://schemas.android.com/tools"
         tools:listitem="@layout/recycler_view_item" />
 

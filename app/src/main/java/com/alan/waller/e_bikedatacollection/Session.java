@@ -2,10 +2,12 @@ package com.alan.waller.e_bikedatacollection;
 
 import android.arch.persistence.room.*;
 import android.support.annotation.*;
+import android.util.Log;
 
 
 @Entity
 public class Session {
+
 
     @PrimaryKey(autoGenerate = true)
     private int sid;
@@ -36,6 +38,7 @@ public class Session {
         this.subjectWeight = subjectWeight;
         this.sessionDate = sessionDate;
         this.sessionLength = sessionLength;
+        Log.d("Session Object", "Session Created");
     }
 
     public int getSid() {
