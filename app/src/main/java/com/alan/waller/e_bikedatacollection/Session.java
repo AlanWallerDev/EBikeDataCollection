@@ -62,7 +62,7 @@ public class Session {
         this.subjectAge = subjectAge;
     }
 
-    public float getSubjectHeight() {
+    public double getSubjectHeight() {
         return subjectHeight;
     }
 
@@ -70,7 +70,7 @@ public class Session {
         this.subjectHeight = subjectHeight;
     }
 
-    public float getSubjectWeight() {
+    public double getSubjectWeight() {
         return subjectWeight;
     }
 
@@ -86,7 +86,7 @@ public class Session {
         this.subjectSex = subjectSex;
     }
 
-    public float getSessionLength() {
+    public double getSessionLength() {
         return sessionLength;
     }
 
