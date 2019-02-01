@@ -12,16 +12,15 @@ import java.util.List;
 public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionViewHolder> {
 
     class SessionViewHolder extends RecyclerView.ViewHolder{
-
         private final TextView sessionItemView;
 
-        private SessionViewHolder(View itemHolder){
+        private SessionViewHolder(View itemView){
             super(itemView);
             sessionItemView = (TextView) itemView.findViewById(R.id.nameView);
         }
 
-    }
 
+    }
     private final LayoutInflater mInflater;
     private List<Session> sessionList; //
 
