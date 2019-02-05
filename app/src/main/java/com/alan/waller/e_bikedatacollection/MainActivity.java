@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
         Button newSesButton = (Button) findViewById(R.id.newSessionButton);
         Button oldSesButton = (Button) findViewById(R.id.oldSessionButton);
         Button signOutButton = (Button) findViewById(R.id.signOutButton);
+        Button pairDevice = (Button) findViewById(R.id.pairButton);
 
         newSesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,6 +31,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, OldSessionActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        pairDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent2 = new Intent(MainActivity.this, NewDevicePair.class);
+                startActivity(intent2);
             }
         });
     }
