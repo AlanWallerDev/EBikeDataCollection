@@ -50,4 +50,14 @@
         app:layout_constraintEnd_toEndOf="@+id/oldSessionButton"
         app:layout_constraintStart_toStartOf="@+id/oldSessionButton"
         app:layout_constraintTop_toBottomOf="@+id/oldSessionButton" />
+
+    <Button
+        android:id="@+id/testPageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TEST"
+        app:layout_constraintEnd_toEndOf="@+id/signOutButton"
+        app:layout_constraintStart_toStartOf="@+id/signOutButton"
+        app:layout_constraintTop_toBottomOf="@+id/signOutButton" />
 </android.support.constraint.ConstraintLayout>
