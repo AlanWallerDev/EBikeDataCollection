@@ -1,16 +1,26 @@
 package com.alan.waller.e_bikedatacollection;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.db.SupportSQLiteDatabase;
+import android.arch.persistence.room.RoomDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class OldSessionActivity extends AppCompatActivity {
@@ -24,8 +34,8 @@ public class OldSessionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.old_sessions_activity);
         Log.d("OldSession", "created");
+
         RecyclerView rv =(RecyclerView) findViewById(R.id.recyclerview);
-        rv.hasFixedSize();
 
         sessionRecyclerViewAdapter = new SessionRecyclerViewAdapter(this);
         rv.setAdapter(sessionRecyclerViewAdapter);
@@ -41,6 +51,9 @@ public class OldSessionActivity extends AppCompatActivity {
             }
         });
 
+
     }
+
+
 
 }

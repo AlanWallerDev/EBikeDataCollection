@@ -16,20 +16,13 @@ public abstract class SessionRoomDatabase extends RoomDatabase {
         if(INSTANCE == null){
             synchronized (SessionRoomDatabase.class){
                 INSTANCE = Room.databaseBuilder(context.getApplicationContext(), SessionRoomDatabase.class, "session-database")
+                        .addCallback(sRoomDatabaseCallback)
                         .build();
             }
         }
 
         return INSTANCE;
     }
-
-    private static RoomDatabase.Callback sRoomDBCallback = new RoomDatabase.Callback(){
-        @Override
-        public void onOpen(@NonNull SupportSQLiteDatabase db) {
-            super.onOpen(db);
-            new PopulateDbAsync(INSTANCE).execute();
-        }
-    };
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
@@ -51,5 +44,15 @@ public abstract class SessionRoomDatabase extends RoomDatabase {
             return null;
         }
     }
+
+    private static RoomDatabase.Callback sRoomDatabaseCallback = new RoomDatabase.Callback() {
+        @Override
+        public void onOpen(@NonNull SupportSQLiteDatabase db) {
+            super.onOpen(db);
+            new PopulateDbAsync(INSTANCE).execute();
+        }
+    };
+
+
 
 }

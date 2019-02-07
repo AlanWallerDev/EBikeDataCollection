@@ -12,19 +12,17 @@ import java.util.List;
 
 public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecyclerViewAdapter.SessionViewHolder> {
 
-    class SessionViewHolder extends RecyclerView.ViewHolder{
+    class SessionViewHolder extends RecyclerView.ViewHolder {
         private final TextView sessionItemView;
 
-        private SessionViewHolder(View itemView){
+        private SessionViewHolder(View itemView) {
             super(itemView);
-            sessionItemView = (TextView) itemView.findViewById(R.id.nameView);
+            sessionItemView = itemView.findViewById(R.id.nameView);
         }
-
-
     }
     private final String TAG = "SRVA";
     private final LayoutInflater mInflater;
-    private List<Session> sessionList; //
+    private List<Session> sessionList;
 
     SessionRecyclerViewAdapter(Context context){ mInflater = LayoutInflater.from(context);}
 
