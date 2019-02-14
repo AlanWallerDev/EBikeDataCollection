@@ -6,7 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.*;
 
-@Database(entities = {Session.class}, version = 1)
+@Database(entities = {Session.class}, version = 1, exportSchema = false)
 public abstract class SessionRoomDatabase extends RoomDatabase {
 
     public abstract SessionDao sessionDao();
