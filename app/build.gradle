@@ -35,8 +35,5 @@ dependencies {
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
     implementation 'com.android.support:recyclerview-v7:26.1.0'
-    //wear OS
-    implementation 'com.android.support:wear:26.1.1'
-    implementation 'com.google.android.support:wearable:2.3.0'
-    compileOnly 'com.google.android.wearable:wearable:2.3.0'
+
 }
