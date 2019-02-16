@@ -84,7 +84,7 @@ public class Test_Page extends AppCompatActivity {
 
     /** Gets the {@link FitnessOptions} in order to check or request OAuth permission for the user. */
     private FitnessOptions getFitnessSignInOptions() {
-        return FitnessOptions.builder().addDataType(DataType.TYPE_HEART_RATE_BPM).build();
+        return FitnessOptions.builder().addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ).build();
     }
 
     /** Checks if user's account has OAuth permission to Fitness API. */
