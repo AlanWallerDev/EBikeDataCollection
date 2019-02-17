@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.fitness.Fitness;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 public class Test_Page2 extends AppCompatActivity {
 
+    TextView heartView;
+
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     String TAG = "TestPage2";
     FitnessOptions fitnessOptions;
@@ -40,6 +44,8 @@ public class Test_Page2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.test_page);
+
+        heartView = (TextView) findViewById(R.id.heartRate);
 
          fitnessOptions = FitnessOptions.builder()
                 .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
@@ -52,6 +58,7 @@ public class Test_Page2 extends AppCompatActivity {
                     GoogleSignIn.getLastSignedInAccount(this),
                     fitnessOptions
             );
+            setResult(Activity.RESULT_OK);
         }else{
             accessGoogleFit();
         }
@@ -76,6 +83,8 @@ public class Test_Page2 extends AppCompatActivity {
                             Value val = dataPoint.getValue(field);
                             Log.i(TAG, "Detected DataPoint Field: " + field.getName());
                             Log.i(TAG, "Detected DataPoint value: " + val);
+                            heartView.setText("Detected DataPoint value: " + val);
+                            Toast.makeText(Test_Page2.this, "Detected DataPoint Field: " + field.getName(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 };
@@ -94,8 +103,10 @@ public class Test_Page2 extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
                             Log.i(TAG, "Listener Registered!");
+                            Toast.makeText(Test_Page2.this, "Listener Registered", Toast.LENGTH_SHORT).show();
                         }else{
                             Log.e(TAG, "Listener Not Registered", task.getException());
+                            Toast.makeText(Test_Page2.this, "Listener Not Registered", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -121,11 +132,13 @@ public class Test_Page2 extends AppCompatActivity {
                                 for(DataSource dataSource : dataSources){
                                     Log.i(TAG, "Data Source Found: " + dataSource.toString());
                                     Log.i(TAG, "Data Source Type: " + dataSource.getDataType().getName());
+                                    Toast.makeText(Test_Page2.this, "Data Source Found: " + dataSource.toString(), Toast.LENGTH_SHORT).show();
 
                                     //Regitster listener to receive data
                                     if(dataSource.getDataType().equals(DataType.TYPE_HEART_RATE_BPM) && mListener == null){
                                         Log.i(TAG, "Data source for LOCATION_SAMPLE found! Registering.");
                                         registerFitnessDataListener(dataSource, DataType.TYPE_HEART_RATE_BPM);
+                                        Toast.makeText(Test_Page2.this, "Data source for LOCATION_SAMPLE found! Registering.", Toast.LENGTH_SHORT).show();
 
                                     }
                                 }
