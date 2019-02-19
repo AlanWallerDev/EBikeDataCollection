@@ -1,43 +1,45 @@
 package com.alan.waller.e_bikedatacollection;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSource;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataReadRequest;
-import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
-import com.google.android.gms.fitness.request.SensorRequest;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.fitness.result.DataReadResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Test_Page2 extends AppCompatActivity {
 
-    TextView heartView;
+    static TextView heartView;
 
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    String TAG = "TestPage2";
+    private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 34;
+    static final String TAG = "TestPage2";
     FitnessOptions fitnessOptions;
     OnDataPointListener mListener;
+    Button readButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,116 +48,138 @@ public class Test_Page2 extends AppCompatActivity {
         setContentView(R.layout.test_page);
 
         heartView = (TextView) findViewById(R.id.heartRate);
+        readButton = (Button) findViewById(R.id.readButton);
 
-         fitnessOptions = FitnessOptions.builder()
-                .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-                .build();
-
-        if(!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)){
+        GoogleSignInOptionsExtension fitnessOptions =
+                FitnessOptions.builder()
+                    .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
+                    .build();
+        Log.i(TAG, "Create Check");
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
+            Log.i(TAG, "if check");
             GoogleSignIn.requestPermissions(
-                    this,
-                    REQUEST_PERMISSIONS_REQUEST_CODE,
+                    this, // your activity
+                    GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
                     GoogleSignIn.getLastSignedInAccount(this),
-                    fitnessOptions
-            );
-            setResult(Activity.RESULT_OK);
-        }else{
+                    fitnessOptions);
+        } else {
             accessGoogleFit();
         }
+
+        readButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                readData();
+            }
+        });
+
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(resultCode == Activity.RESULT_OK){
-            if(requestCode == REQUEST_PERMISSIONS_REQUEST_CODE){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult called");
+        Log.i(TAG, "Activity result = " + resultCode);
+        Log.i(TAG, "Activity request = "  + requestCode);
+        if (resultCode == Activity.RESULT_OK) {
+
+            if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
+
                 accessGoogleFit();
             }
         }
     }
 
-    public void registerFitnessDataListener(DataSource dataSource, DataType dataType){
-        mListener =
-                new OnDataPointListener() {
+    public void accessGoogleFit(){
+        Log.i(TAG, "accessGoogleFitCalled");
+        Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .subscribe(DataType.TYPE_HEART_RATE_BPM)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onDataPoint(DataPoint dataPoint) {
-                        for(Field field : dataPoint.getDataType().getFields()) {
-                            Value val = dataPoint.getValue(field);
-                            Log.i(TAG, "Detected DataPoint Field: " + field.getName());
-                            Log.i(TAG, "Detected DataPoint value: " + val);
-                            heartView.setText("Detected DataPoint value: " + val);
-                            Toast.makeText(Test_Page2.this, "Detected DataPoint Field: " + field.getName(), Toast.LENGTH_SHORT).show();
-                        }
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Successfully subscribed!");
                     }
-                };
-
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .add(
-                        new SensorRequest.Builder()
-                            .setDataSource(dataSource)
-                        .setDataType(dataType)
-                        .setSamplingRate(3, TimeUnit.SECONDS)
-                        .build(),
-                        mListener
-                ).addOnCompleteListener(
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            Log.i(TAG, "Listener Registered!");
-                            Toast.makeText(Test_Page2.this, "Listener Registered", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Log.e(TAG, "Listener Not Registered", task.getException());
-                            Toast.makeText(Test_Page2.this, "Listener Not Registered", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-        );
-    }
-
-
-    private void accessGoogleFit() {
-
-
-        //the following lists all data sources
-
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .findDataSources(
-                        new DataSourcesRequest.Builder()
-                            .setDataTypes(DataType.TYPE_HEART_RATE_BPM)
-                        .setDataSourceTypes(DataSource.TYPE_RAW)
-                        .build())
-                .addOnSuccessListener(
-                        new OnSuccessListener<List<DataSource>>() {
-                            @Override
-                            public void onSuccess(List<DataSource> dataSources) {
-                                for(DataSource dataSource : dataSources){
-                                    Log.i(TAG, "Data Source Found: " + dataSource.toString());
-                                    Log.i(TAG, "Data Source Type: " + dataSource.getDataType().getName());
-                                    Toast.makeText(Test_Page2.this, "Data Source Found: " + dataSource.toString(), Toast.LENGTH_SHORT).show();
-
-                                    //Regitster listener to receive data
-                                    if(dataSource.getDataType().equals(DataType.TYPE_HEART_RATE_BPM) && mListener == null){
-                                        Log.i(TAG, "Data source for LOCATION_SAMPLE found! Registering.");
-                                        registerFitnessDataListener(dataSource, DataType.TYPE_HEART_RATE_BPM);
-                                        Toast.makeText(Test_Page2.this, "Data source for LOCATION_SAMPLE found! Registering.", Toast.LENGTH_SHORT).show();
-
-                                    }
-                                }
-                            }
-                        }
-                ).addOnFailureListener(
-                new OnFailureListener() {
+                })
+                .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "failed", e);
+                        Log.i(TAG, "There was a problem subscribing.");
                     }
-                }
-        );
+                });
 
     }
 
+    @Override
+    protected void onStop(){
+        super.onStop();
+        Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .unsubscribe(DataType.TYPE_HEART_RATE_BPM)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Successfully unsubscribed for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Subscription not removed
+                        Log.i(TAG, "Failed to unsubscribe for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                    }
+                });
+    }
 
+    public void readData(){
+        // Setting a start and end date using a range of 1 week before this moment.
+        Calendar cal = Calendar.getInstance();
+        Date now = new Date();
+        cal.setTime(now);
+        long endTime = cal.getTimeInMillis();
+        cal.add(Calendar.WEEK_OF_YEAR, -1);
+        long startTime = cal.getTimeInMillis();
+
+        java.text.DateFormat dateFormat = DateFormat.getDateInstance();
+        Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+        Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+        DataReadRequest readRequest =
+                new DataReadRequest.Builder()
+                        // The data request can specify multiple data types to return, effectively
+                        // combining multiple data queries into one call.
+                        // In this example, it's very unlikely that the request is for several hundred
+                        // datapoints each consisting of a few steps and a timestamp.  The more likely
+                        // scenario is wanting to see how many steps were walked per day, for 7 days.
+                        .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                        // Analogous to a "Group By" in SQL, defines how data should be aggregated.
+                        // bucketByTime allows for a time span, whereas bucketBySession would allow
+                        // bucketing by "sessions", which would need to be defined in code.
+                        .bucketByTime(1, TimeUnit.DAYS)
+                        .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                        .build();
+    Log.i(TAG, "readRequest made");
+        Task<DataReadResponse> response = Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this)).readData(readRequest);
+        List<DataSet> dataSets = response.getResult().getDataSets();
+
+        for(int i = 0; i < dataSets.size(); i++){
+            dumpDataSet(dataSets.get(i));
+        }
+    }
+
+    private static void dumpDataSet(DataSet dataSet) {
+        Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+        DateFormat dateFormat = DateFormat.getTimeInstance();
+
+        for (DataPoint dp : dataSet.getDataPoints()) {
+            Log.i(TAG, "Data point:");
+            Log.i(TAG, "\tType: " + dp.getDataType().getName());
+            Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+            Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+            for (Field field : dp.getDataType().getFields()) {
+                Log.i(TAG, "\tField: " + field.getName() + " Value: " + dp.getValue(field));
+                heartView.setText(dp.getValue(field).toString());
+            }
+        }
+    }
 
 
 }
