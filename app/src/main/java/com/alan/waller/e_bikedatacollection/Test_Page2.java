@@ -112,21 +112,25 @@ public class Test_Page2 extends AppCompatActivity {
     @Override
     protected void onStop(){
         super.onStop();
-        Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .unsubscribe(DataType.TYPE_HEART_RATE_BPM)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.i(TAG, "Successfully unsubscribed for data type: " + DataType.TYPE_HEART_RATE_BPM);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Subscription not removed
-                        Log.i(TAG, "Failed to unsubscribe for data type: " + DataType.TYPE_HEART_RATE_BPM);
-                    }
-                });
+        try {
+            Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                    .unsubscribe(DataType.TYPE_HEART_RATE_BPM)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.i(TAG, "Successfully unsubscribed for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Subscription not removed
+                            Log.i(TAG, "Failed to unsubscribe for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                        }
+                    });
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void readData(){
