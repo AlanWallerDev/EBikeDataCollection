@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         Button pairDevice = (Button) findViewById(R.id.pairButton);
         //test button
         Button testPage = (Button) findViewById(R.id.testPageButton);
+        //mapTest Button
+        Button mapTest = (Button) findViewById(R.id.mapTest);
 
         newSesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,5 +55,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //button for test purposes only
+        mapTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, GPSTest.class);
+                startActivity(intent);
+            }
+        });
     }
 }
