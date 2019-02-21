@@ -76,11 +76,23 @@ public class Test_Page2 extends AppCompatActivity {
 
     }
 
+    public void signIn(){
+        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
+            Log.i(TAG, "if check");
+            GoogleSignIn.requestPermissions(
+                    this, // your activity
+                    GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+                    GoogleSignIn.getLastSignedInAccount(this),
+                    fitnessOptions);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.i(TAG, "onActivityResult called");
         Log.i(TAG, "Activity result = " + resultCode);
         Log.i(TAG, "Activity request = "  + requestCode);
+        Log.i(TAG, "error? " + data.getStringExtra("Error"));
         if (resultCode == Activity.RESULT_OK) {
 
             if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
@@ -134,6 +146,7 @@ public class Test_Page2 extends AppCompatActivity {
     }
 
     public void readData(){
+        Log.i(TAG, "readData called");
         // Setting a start and end date using a range of 1 week before this moment.
         Calendar cal = Calendar.getInstance();
         Date now = new Date();
@@ -170,6 +183,7 @@ public class Test_Page2 extends AppCompatActivity {
     }
 
     private static void dumpDataSet(DataSet dataSet) {
+        Log.i(TAG, "dumpDataSet called");
         Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         DateFormat dateFormat = DateFormat.getTimeInstance();
 

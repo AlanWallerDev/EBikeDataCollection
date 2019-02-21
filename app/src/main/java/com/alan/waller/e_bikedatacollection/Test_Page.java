@@ -75,6 +75,7 @@ public class Test_Page extends AppCompatActivity {
      * continue to {@link #findFitnessDataSources}, else request OAuth permission for the account.
      */
     private void findFitnessDataSourcesWrapper() {
+        Log.i(TAG, "findFitnessDataSourcesWrapper called");
         if (hasOAuthPermission()) {
             findFitnessDataSources();
         } else {
@@ -84,17 +85,20 @@ public class Test_Page extends AppCompatActivity {
 
     /** Gets the {@link FitnessOptions} in order to check or request OAuth permission for the user. */
     private FitnessOptions getFitnessSignInOptions() {
+        Log.i(TAG, "getFitnessSignInOptions calles");
         return FitnessOptions.builder().addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ).build();
     }
 
     /** Checks if user's account has OAuth permission to Fitness API. */
     private boolean hasOAuthPermission() {
+        Log.i(TAG, "hasOAuthPermission called");
         FitnessOptions fitnessOptions = getFitnessSignInOptions();
         return GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions);
     }
 
     /** Launches the Google SignIn activity to request OAuth permission for the user. */
     private void requestOAuthPermission() {
+        Log.i(TAG, "requestOAuthPermission called");
         FitnessOptions fitnessOptions = getFitnessSignInOptions();
         GoogleSignIn.requestPermissions(
                 this,
@@ -114,6 +118,7 @@ public class Test_Page extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult called");
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
                 findFitnessDataSources();
@@ -124,6 +129,7 @@ public class Test_Page extends AppCompatActivity {
 
     /** Finds available data sources and attempts to register on a specific {@link DataType}. */
     private void findFitnessDataSources() {
+        Log.i(TAG, "findFitnessDataSources called");
         // [START find_data_sources]
         // Note: Fitness.SensorsApi.findDataSources() requires the ACCESS_FINE_LOCATION permission.
         Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
@@ -164,6 +170,7 @@ public class Test_Page extends AppCompatActivity {
      * DataType} combo.
      */
     private void registerFitnessDataListener(DataSource dataSource) {
+        Log.i(TAG, "registerFitnessDataListener called");
         // [START register_data_listener]
         mListener =
                 new OnDataPointListener() {
@@ -206,6 +213,7 @@ public class Test_Page extends AppCompatActivity {
 
     /** Unregisters the listener with the Sensors API. */
     private void unregisterFitnessDataListener() {
+        Log.i(TAG, "unRegisterFitnessDataListener called");
         if (mListener == null) {
             // This code only activates one listener at a time.  If there's no listener, there's
             // nothing to unregister.
@@ -237,6 +245,7 @@ public class Test_Page extends AppCompatActivity {
 
     /** Returns the current state of the permissions needed. */
     private boolean hasRuntimePermissions() {
+        Log.i(TAG, "hasRuntimePermissions called");
         int permissionState =
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS);
         return permissionState == PackageManager.PERMISSION_GRANTED;
@@ -266,7 +275,7 @@ public class Test_Page extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.i(TAG, "onRequestPermissionResult");
+        Log.i(TAG, "onRequestPermissionResult called");
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if (grantResults.length <= 0) {
                 // If user interaction was interrupted, the permission request is cancelled and you
