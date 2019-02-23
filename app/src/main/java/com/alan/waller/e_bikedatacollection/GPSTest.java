@@ -11,6 +11,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+
 public class GPSTest extends FragmentActivity implements OnMapReadyCallback ,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -42,10 +45,17 @@ public class GPSTest extends FragmentActivity implements OnMapReadyCallback ,
     private FusedLocationProviderClient mFusedLocationClient;
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
 
+
+    TextView currentElevation;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gps_page);
+
+        currentElevation = findViewById(R.id.elevation);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -76,7 +86,7 @@ public class GPSTest extends FragmentActivity implements OnMapReadyCallback ,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Should we show an explanation?
@@ -123,7 +133,10 @@ public class GPSTest extends FragmentActivity implements OnMapReadyCallback ,
                                 mLastLocation = (Location) task.getResult();
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(mLastLocation.getLatitude(),
-                                                mLastLocation.getLongitude()), 15));
+                                                mLastLocation.getLongitude()), 20));
+                                mLastLocation.getAltitude();
+                                double alt = mLastLocation.getAltitude();
+                                currentElevation.setText(Double.toString(alt));
                             } else {
                                 Log.d("TAG", "Current location is null. Using defaults.");
                                 Log.e("TAG", "Exception: %s", task.getException());
@@ -256,14 +269,18 @@ public class GPSTest extends FragmentActivity implements OnMapReadyCallback ,
 
     @Override
     public void onLocationChanged(Location location) {
-
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         if (location != null) {
-            //mLastLocation = location;
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
-            mMap.animateCamera(cameraUpdate);
+            if(mMap != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(location.getLatitude(),
+                                location.getLongitude()), 20));
+                double alt = location.getAltitude();
+                currentElevation.setText(Double.toString(alt));
+                Toast.makeText(this, Double.toString(alt), Toast.LENGTH_SHORT).show();
+            }
         }
+
+
     }
 }
