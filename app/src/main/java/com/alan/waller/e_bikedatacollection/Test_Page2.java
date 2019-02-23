@@ -1,19 +1,28 @@
 package com.alan.waller.e_bikedatacollection;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptionsExtension;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessOptions;
+import com.google.android.gms.fitness.HistoryApi;
+import com.google.android.gms.fitness.HistoryClient;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -21,21 +30,25 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
 import com.google.android.gms.fitness.result.DataReadResponse;
+import com.google.android.gms.fitness.result.DataReadResult;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class Test_Page2 extends AppCompatActivity {
 
     static TextView heartView;
 
-    private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 34;
+    private static final int GOOGLE_FIT_PERMISSIONS_REQUEST_CODE = 1;
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     static final String TAG = "TestPage2";
     FitnessOptions fitnessOptions;
     OnDataPointListener mListener;
@@ -44,46 +57,82 @@ public class Test_Page2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.test_page);
 
         heartView = (TextView) findViewById(R.id.heartRate);
         readButton = (Button) findViewById(R.id.readButton);
 
-        GoogleSignInOptionsExtension fitnessOptions =
-                FitnessOptions.builder()
-                    .addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ)
-                    .build();
-        Log.i(TAG, "Create Check");
-        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
-            Log.i(TAG, "if check");
-            GoogleSignIn.requestPermissions(
-                    this, // your activity
-                    GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-                    GoogleSignIn.getLastSignedInAccount(this),
-                    fitnessOptions);
+        if (hasRuntimePermissions()) {
+            findFitnessDataSourcesWrapper();
         } else {
-            accessGoogleFit();
+            requestRuntimePermissions();
         }
+
 
         readButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                readData();
+                try {
+                    readData();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
         });
 
 
     }
+    private boolean hasRuntimePermissions() {
+        Log.i(TAG, "hasRuntimePermissions called");
+        int permissionState =
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS);
+        return permissionState == PackageManager.PERMISSION_GRANTED;
+    }
+    private void findFitnessDataSourcesWrapper() {
+        Log.i(TAG, "findFitnessDataSourcesWrapper called");
+        if (hasOAuthPermission()) {
+            accessGoogleFit();
+        } else {
+            requestOAuthPermission();
+        }
+    }
+    private boolean hasOAuthPermission() {
+        Log.i(TAG, "hasOAuthPermission called");
+        FitnessOptions fitnessOptions = getFitnessSignInOptions();
+        return GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions);
+    }
+    private FitnessOptions getFitnessSignInOptions() {
+        Log.i(TAG, "getFitnessSignInOptions calles");
+        return FitnessOptions.builder().addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ).build();
+    }
 
-    public void signIn(){
-        if (!GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions)) {
-            Log.i(TAG, "if check");
-            GoogleSignIn.requestPermissions(
-                    this, // your activity
-                    GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
-                    GoogleSignIn.getLastSignedInAccount(this),
-                    fitnessOptions);
+    private void requestOAuthPermission() {
+        Log.i(TAG, "requestOAuthPermission called");
+        FitnessOptions fitnessOptions = getFitnessSignInOptions();
+        GoogleSignIn.requestPermissions(
+                this,
+                GOOGLE_FIT_PERMISSIONS_REQUEST_CODE,
+                GoogleSignIn.getLastSignedInAccount(this),
+                fitnessOptions);
+    }
+
+    private void requestRuntimePermissions() {
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, Manifest.permission.BODY_SENSORS);
+
+        if (shouldProvideRationale) {
+            Log.i(TAG, "Displaying permission rationale to provide additional context.");
+
+        } else {
+            Log.i(TAG, "Requesting permission");
+            // Request permission. It's possible this can be auto answered if device policy
+            // sets the permission in a given state or the user denied the permission
+            // previously and checked "Never ask again".
+            ActivityCompat.requestPermissions(
+                    Test_Page2.this,
+                    new String[] {Manifest.permission.BODY_SENSORS},
+                    REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
 
@@ -92,7 +141,6 @@ public class Test_Page2 extends AppCompatActivity {
         Log.i(TAG, "onActivityResult called");
         Log.i(TAG, "Activity result = " + resultCode);
         Log.i(TAG, "Activity request = "  + requestCode);
-        Log.i(TAG, "error? " + data.getStringExtra("Error"));
         if (resultCode == Activity.RESULT_OK) {
 
             if (requestCode == GOOGLE_FIT_PERMISSIONS_REQUEST_CODE) {
@@ -116,6 +164,7 @@ public class Test_Page2 extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.i(TAG, "There was a problem subscribing.");
+                        e.printStackTrace();
                     }
                 });
 
@@ -146,6 +195,10 @@ public class Test_Page2 extends AppCompatActivity {
     }
 
     public void readData(){
+        HistoryClient mClient = Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this));
+        new ReadTask().execute(mClient);
+        /**
+        try{
         Log.i(TAG, "readData called");
         // Setting a start and end date using a range of 1 week before this moment.
         Calendar cal = Calendar.getInstance();
@@ -166,26 +219,77 @@ public class Test_Page2 extends AppCompatActivity {
                         // In this example, it's very unlikely that the request is for several hundred
                         // datapoints each consisting of a few steps and a timestamp.  The more likely
                         // scenario is wanting to see how many steps were walked per day, for 7 days.
-                        .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                        .read(DataType.TYPE_HEART_RATE_BPM)
                         // Analogous to a "Group By" in SQL, defines how data should be aggregated.
                         // bucketByTime allows for a time span, whereas bucketBySession would allow
                         // bucketing by "sessions", which would need to be defined in code.
-                        .bucketByTime(1, TimeUnit.DAYS)
                         .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
                         .build();
     Log.i(TAG, "readRequest made");
         Task<DataReadResponse> response = Fitness.getHistoryClient(this, GoogleSignIn.getLastSignedInAccount(this)).readData(readRequest);
-        List<DataSet> dataSets = response.getResult().getDataSets();
+        DataReadResponse dataReadResponse = Tasks.await(response);
+        DataSet dataSet = dataReadResponse.getDataSet(DataType.TYPE_HEART_RATE_BPM);
+    Log.i(TAG, "data sets gathered: " + dataSet.toString());
+        dumpDataSet(dataSet);
+    }catch (Exception e){
+            e.printStackTrace();
+        }
+         **/
+    }
 
-        for(int i = 0; i < dataSets.size(); i++){
-            dumpDataSet(dataSets.get(i));
+    private class ReadTask extends AsyncTask<HistoryClient, Void, Task<DataReadResponse>>{
+
+        @Override
+        protected Task<DataReadResponse> doInBackground(HistoryClient... params){
+            try {
+                Log.i(TAG, "readData called");
+                // Setting a start and end date using a range of 1 week before this moment.
+                Calendar cal = Calendar.getInstance();
+                Date now = new Date();
+                cal.setTime(now);
+                long endTime = cal.getTimeInMillis();
+                cal.add(Calendar.WEEK_OF_YEAR, -1);
+                long startTime = cal.getTimeInMillis();
+
+                java.text.DateFormat dateFormat = DateFormat.getDateInstance();
+                Log.i(TAG, "Range Start: " + dateFormat.format(startTime));
+                Log.i(TAG, "Range End: " + dateFormat.format(endTime));
+
+                DataReadRequest readRequest =
+                        new DataReadRequest.Builder()
+                                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                                .bucketByTime(1, TimeUnit.DAYS)
+                                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                                .build();
+                Log.i(TAG, "readRequest made");
+                return params[0].readData(readRequest);
+
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Task<DataReadResponse> response){
+            Log.i(TAG, "onPostExecute: " + response.isSuccessful());
+            try {
+                List<DataSet> dataSets = response.getResult().getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    dumpDataSet(dataSet);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
+
 
     private static void dumpDataSet(DataSet dataSet) {
         Log.i(TAG, "dumpDataSet called");
         Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
         DateFormat dateFormat = DateFormat.getTimeInstance();
+        List<DataPoint> dataList = dataSet.getDataPoints();
+        Log.i(TAG, "data points: " + dataList.size());
 
         for (DataPoint dp : dataSet.getDataPoints()) {
             Log.i(TAG, "Data point:");

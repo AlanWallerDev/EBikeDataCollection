@@ -142,6 +142,8 @@ public class Test_Page extends AppCompatActivity {
                         new OnSuccessListener<List<DataSource>>() {
                             @Override
                             public void onSuccess(List<DataSource> dataSources) {
+                                Log.i(TAG, "Listener Success");
+                                Log.i(TAG, "DataSources: " + dataSources.size());
                                 for (DataSource dataSource : dataSources) {
                                     Log.i(TAG, "Data source found: " + dataSource.toString());
                                     Log.i(TAG, "Data Source type: " + dataSource.getDataType().getName());
