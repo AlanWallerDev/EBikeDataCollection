@@ -39,8 +39,8 @@ public abstract class SessionRoomDatabase extends RoomDatabase {
                     180.5,
                     75.0,
                     "Male",
-                    123,
-                    123));
+                    Long.parseLong("123"),
+                    "01-10-2010"));
             return null;
         }
     }

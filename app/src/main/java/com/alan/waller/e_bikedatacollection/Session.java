@@ -22,15 +22,15 @@ public class Session {
 
     private String subjectSex;
 
-    private double sessionLength;
+    private Long sessionLength;
 
     //todo: unsure how to store date, i believe timestamp is a long value?
-    private long sessionDate;
+    private String sessionDate;
 
     Session(@NonNull String subjectName, @NonNull int subjectAge,
             @NonNull double subjectHeight, @NonNull double subjectWeight,
-            @NonNull String subjectSex, @NonNull double sessionLength,
-            @NonNull long sessionDate){
+            @NonNull String subjectSex, @NonNull Long sessionLength,
+            @NonNull String sessionDate){
         this.subjectAge = subjectAge;
         this.subjectHeight = subjectHeight;
         this.subjectName = subjectName;
@@ -89,19 +89,24 @@ public class Session {
         this.subjectSex = subjectSex;
     }
 
-    public double getSessionLength() {
+    public Long getSessionLength() {
         return sessionLength;
     }
 
-    public void setSessionLength(float sessionLength) {
+    public void setSessionLength(Long sessionLength) {
         this.sessionLength = sessionLength;
     }
 
-    public long getSessionDate() {
+    public String getSessionDate() {
         return sessionDate;
     }
 
-    public void setSessionDate(long sessionDate) {
+    public void setSessionDate(String sessionDate) {
         this.sessionDate = sessionDate;
+    }
+
+
+    public String toString(){
+        return "Subject: " + subjectName + ", Age: " + subjectAge + ", Weight: " + subjectWeight + ", Height: " + subjectHeight + ", Sex: " + subjectSex + ", Date: " + sessionDate + ", Session Length : " + sessionLength;
     }
 }
