@@ -157,13 +157,28 @@ public class Test_Page2 extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.i(TAG, "Successfully subscribed!");
+                        Log.i(TAG, "Successfully subscribed! BPM");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.i(TAG, "There was a problem subscribing.");
+                        Log.i(TAG, "There was a problem subscribing. BPM");
+                        e.printStackTrace();
+                    }
+                });
+        Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                .subscribe(DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.i(TAG, "Successfully subscribed! Summary");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.i(TAG, "There was a problem subscribing. Summary");
                         e.printStackTrace();
                     }
                 });
@@ -176,6 +191,21 @@ public class Test_Page2 extends AppCompatActivity {
         try {
             Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
                     .unsubscribe(DataType.TYPE_HEART_RATE_BPM)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.i(TAG, "Successfully unsubscribed for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Subscription not removed
+                            Log.i(TAG, "Failed to unsubscribe for data type: " + DataType.TYPE_HEART_RATE_BPM);
+                        }
+                    });
+            Fitness.getRecordingClient(this, GoogleSignIn.getLastSignedInAccount(this))
+                    .unsubscribe(DataType.AGGREGATE_HEART_RATE_SUMMARY)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
