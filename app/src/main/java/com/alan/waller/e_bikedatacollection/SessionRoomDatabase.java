@@ -6,10 +6,11 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.*;
 
-@Database(entities = {Session.class}, version = 1)
+@Database(entities = {Session.class, HeartRate.class}, version = 1)
 public abstract class SessionRoomDatabase extends RoomDatabase {
 
     public abstract SessionDao sessionDao();
+    public abstract HeartRateDao heartRateDao();
     private static SessionRoomDatabase INSTANCE;
 
     public static SessionRoomDatabase getDatabase(final Context context){
@@ -26,15 +27,15 @@ public abstract class SessionRoomDatabase extends RoomDatabase {
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
-        private final SessionDao mDao;
+        private final SessionDao sessionDao;
         PopulateDbAsync(SessionRoomDatabase db){
-            mDao = db.sessionDao();
+            sessionDao = db.sessionDao();
 
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.insert(new Session("Test Subject",
+            sessionDao.insert(new Session("Test Subject",
                     21,
                     180.5,
                     75.0,
