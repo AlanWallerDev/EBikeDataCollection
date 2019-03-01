@@ -11,6 +11,7 @@ public abstract class SessionRoomDatabase extends RoomDatabase {
 
     public abstract SessionDao sessionDao();
     public abstract HeartRateDao heartRateDao();
+    public abstract GPSDataDao gpsDataDao();
     private static SessionRoomDatabase INSTANCE;
 
     public static SessionRoomDatabase getDatabase(final Context context){
