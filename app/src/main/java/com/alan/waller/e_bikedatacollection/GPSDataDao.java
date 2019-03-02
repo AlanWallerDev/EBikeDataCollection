@@ -18,7 +18,7 @@ public interface GPSDataDao {
     void delete(GPSData gpsData);
 
     @Query("SELECT * FROM GPSData ORDER BY gid ASC")
-    LiveData<List<HeartRate>> getAll();
+    LiveData<List<GPSData>> getAll();
 
     @Update
     void update(GPSData gpsData);
