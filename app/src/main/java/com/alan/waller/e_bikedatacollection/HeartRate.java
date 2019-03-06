@@ -12,9 +12,9 @@ public class HeartRate {
 
     private int heartRate;
 
-    private int timeStamp;
+    private long timeStamp;
 
-   HeartRate(@NonNull int heartRate, @NonNull int timeStamp){
+   HeartRate(@NonNull int heartRate, @NonNull long timeStamp){
         this.heartRate = heartRate;
         this.timeStamp = timeStamp;
     }
@@ -35,11 +35,11 @@ public class HeartRate {
         this.heartRate = heartRate;
     }
 
-    public int getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(int timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 }

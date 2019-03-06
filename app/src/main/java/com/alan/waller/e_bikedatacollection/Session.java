@@ -8,7 +8,7 @@ import android.util.Log;
 @Entity
 public class Session {
 
-
+    //TODO: Alter session to include timestamp for start and end times
     @PrimaryKey(autoGenerate = true)
     private int sid;
 

@@ -20,6 +20,9 @@ public interface GPSDataDao {
     @Query("SELECT * FROM GPSData ORDER BY gid ASC")
     LiveData<List<GPSData>> getAll();
 
+    @Query("SELECT * FROM GPSData WHERE timestamp > :start AND timestamp < :end")
+    LiveData<List<GPSData>> getSessionGPSData(long start, long end);
+
     @Update
     void update(GPSData gpsData);
 

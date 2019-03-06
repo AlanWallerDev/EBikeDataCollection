@@ -48,6 +48,12 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
         // inflate the recycler_item_view layout
         View itemView = mInflater.inflate(R.layout.recycler_view_item, parent, false);
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO: Create functionality to retrieve session info when old session is clicked
+            }
+        });
         return new SessionViewHolder(itemView);
     }
 
