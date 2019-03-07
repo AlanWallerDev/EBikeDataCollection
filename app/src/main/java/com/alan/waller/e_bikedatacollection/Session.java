@@ -8,7 +8,6 @@ import android.util.Log;
 @Entity
 public class Session {
 
-    //TODO: Alter session to include timestamp for start and end times
     @PrimaryKey(autoGenerate = true)
     private int sid;
 
@@ -22,22 +21,21 @@ public class Session {
 
     private String subjectSex;
 
-    private Long sessionLength;
+    private long startTime;
 
-    //todo: unsure how to store date, i believe timestamp is a long value?
-    private String sessionDate;
+    private long endTime;
 
     Session(@NonNull String subjectName, @NonNull int subjectAge,
             @NonNull double subjectHeight, @NonNull double subjectWeight,
-            @NonNull String subjectSex, @NonNull Long sessionLength,
-            @NonNull String sessionDate){
+            @NonNull String subjectSex, @NonNull long startTime,
+            @NonNull long endTime){
         this.subjectAge = subjectAge;
         this.subjectHeight = subjectHeight;
         this.subjectName = subjectName;
         this.subjectSex = subjectSex;
         this.subjectWeight = subjectWeight;
-        this.sessionDate = sessionDate;
-        this.sessionLength = sessionLength;
+        this.endTime = endTime;
+        this.startTime = startTime;
         Log.d("Session Object", "Session Created");
     }
 
@@ -89,24 +87,23 @@ public class Session {
         this.subjectSex = subjectSex;
     }
 
-    public Long getSessionLength() {
-        return sessionLength;
+    public long getStartTime() {
+        return startTime;
     }
 
-    public void setSessionLength(Long sessionLength) {
-        this.sessionLength = sessionLength;
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
     }
 
-    public String getSessionDate() {
-        return sessionDate;
+    public long getEndTime() {
+        return endTime;
     }
 
-    public void setSessionDate(String sessionDate) {
-        this.sessionDate = sessionDate;
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
     }
-
 
     public String toString(){
-        return "Subject: " + subjectName + ", Age: " + subjectAge + ", Weight: " + subjectWeight + ", Height: " + subjectHeight + ", Sex: " + subjectSex + ", Date: " + sessionDate + ", Session Length : " + sessionLength;
+        return "Subject: " + subjectName + ", Age: " + subjectAge + ", Weight: " + subjectWeight + ", Height: " + subjectHeight + ", Sex: " + subjectSex + ", startTime: " + startTime + ", Session end time: " + endTime;
     }
 }

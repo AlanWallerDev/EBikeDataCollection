@@ -1,6 +1,7 @@
 package com.alan.waller.e_bikedatacollection;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,10 +15,14 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
 
     class SessionViewHolder extends RecyclerView.ViewHolder {
         private final TextView sessionItemView;
+        private final TextView startTimeView;
+        private final TextView endTimeView;
 
         private SessionViewHolder(View itemView) {
             super(itemView);
             sessionItemView = itemView.findViewById(R.id.nameView);
+            startTimeView = itemView.findViewById(R.id.startView);
+            endTimeView = itemView.findViewById(R.id.endView);
         }
     }
     private final String TAG = "SRVA";
@@ -37,6 +42,8 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
         if(sessionList != null){
             Session current = sessionList.get(position);
             holder.sessionItemView.setText(current.getSubjectName());
+            holder.startTimeView.setText(current.getStartTime() + "");
+            holder.endTimeView.setText(current.getEndTime() + "");
         }else{
             holder.sessionItemView.setText("No Session");
         }
@@ -44,14 +51,23 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
     }
 
     @Override
-    public SessionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SessionViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
 
         // inflate the recycler_item_view layout
-        View itemView = mInflater.inflate(R.layout.recycler_view_item, parent, false);
+        final View itemView = mInflater.inflate(R.layout.recycler_view_item, parent, false);
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: Create functionality to retrieve session info when old session is clicked
+                TextView startView = itemView.findViewById(R.id.startView);
+                TextView endView = itemView.findViewById(R.id.endView);
+
+                long startTime = Long.parseLong(startView.getText().toString());
+                long endTime = Long.parseLong(endView.getText().toString());
+                //TODO: create session data display activity
+                Intent intent = new Intent(itemView.getContext(), insert activity name here.class);
+                intent.putExtra("START_TIME", startTime);
+                intent.putExtra("END_TIME", endTime);
+                itemView.getContext().startActivity(intent);
             }
         });
         return new SessionViewHolder(itemView);
