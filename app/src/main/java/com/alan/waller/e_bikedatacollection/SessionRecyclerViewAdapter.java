@@ -64,10 +64,10 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionRecy
                 long startTime = Long.parseLong(startView.getText().toString());
                 long endTime = Long.parseLong(endView.getText().toString());
                 //TODO: create session data display activity
-                Intent intent = new Intent(itemView.getContext(), insert activity name here.class);
-                intent.putExtra("START_TIME", startTime);
-                intent.putExtra("END_TIME", endTime);
-                itemView.getContext().startActivity(intent);
+                //Intent intent = new Intent(itemView.getContext(), insert activity name here.class);
+                //intent.putExtra("START_TIME", startTime);
+                //intent.putExtra("END_TIME", endTime);
+                //itemView.getContext().startActivity(intent);
             }
         });
         return new SessionViewHolder(itemView);
