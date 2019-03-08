@@ -1,5 +1,6 @@
 package com.alan.waller.e_bikedatacollection;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -64,6 +65,8 @@ public class SessionActivity extends AppCompatActivity {
                 session = new Session(subjectName, subjectAge, subjectHeight, subjectWeight, subjectSex, startTime, endTime);
                 sessionRepository.insertSession(session);
                 Toast.makeText(SessionActivity.this, session.toString(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SessionActivity.this, MainActivity.class);
+                startActivity(intent);
 
             }
         });

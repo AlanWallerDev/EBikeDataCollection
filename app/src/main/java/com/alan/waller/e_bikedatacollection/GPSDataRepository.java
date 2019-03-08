@@ -44,6 +44,7 @@ public class GPSDataRepository {
     public void gpsDataAccessor(List<GPSData> gpsData, long startTime, long endTime){
         GPSData temp;
         Log.d(TAG, gpsData.size() + "");
+        accessedData.clear();
         for (int i = 0; i < gpsData.size(); i++) {
             temp = gpsData.get(i);
             if (temp.getTimestamp() >= startTime && temp.getTimestamp() <= endTime) {

@@ -43,6 +43,7 @@ public class HeartRateRepository {
 
     public void heartRateAccessor(List<HeartRate> hrData, long startTime, long endTime){
         HeartRate temp;
+        accessedData.clear();
         for (int i = 0; i < hrData.size(); i++) {
             temp = hrData.get(i);
             if (temp.getTimeStamp() >= startTime && temp.getTimeStamp() <= endTime) {
