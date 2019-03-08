@@ -42,4 +42,8 @@ public class GPSData {
     public void setData(String data) {
         this.data = data;
     }
+
+    public String toString(){
+        return "Timestamp: " + timestamp + ", Data: " + data;
+    }
 }

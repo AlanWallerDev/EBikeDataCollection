@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GPSDataRepository {
@@ -19,6 +20,20 @@ public class GPSDataRepository {
 
     public void insertGpsData(GPSData gpsData){new InsertAsyncTask(gpsDataDao).execute(gpsData);}
 
+    public List<GPSData> accessGpsData(long startTime, long endTime){
+        List<GPSData> allData = mAllGpsDataPoints.getValue();
+        List<GPSData> accessedData = new ArrayList<>();
+        GPSData temp;
+        for(int i = 0; i < allData.size(); i++){
+            temp = allData.get(i);
+            if(temp.getTimestamp() > startTime && temp.getTimestamp() < endTime){
+                accessedData.add(temp);
+            }
+        }
+
+        return accessedData;
+    }
+
     private static class InsertAsyncTask extends AsyncTask<GPSData, Void, Void> {
         private GPSDataDao gpsDataDao;
         InsertAsyncTask(GPSDataDao gpsDataDao){
@@ -31,5 +46,6 @@ public class GPSDataRepository {
             return null;
         }
     }
+
 
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HeartRateRepository {
@@ -20,6 +21,20 @@ public class HeartRateRepository {
     public LiveData<List<HeartRate>> getmAllHeartRates(){ return mAllHeartRates;}
 
     public void insertHeartRate(HeartRate heartRate){new InsertAsyncTask(heartRateDao).execute(heartRate);}
+
+    public List<HeartRate> accessHeartRateData(long startTime, long endTime){
+        List<HeartRate> allData = mAllHeartRates.getValue();
+        List<HeartRate> accessedData = new ArrayList<>();
+        HeartRate temp;
+        for(int i = 0; i < allData.size(); i++){
+            temp = allData.get(i);
+            if(temp.getTimeStamp() > startTime && temp.getTimeStamp() < endTime){
+                accessedData.add(temp);
+            }
+        }
+
+        return accessedData;
+    }
 
     private static class InsertAsyncTask extends AsyncTask<HeartRate, Void, Void> {
         private HeartRateDao heartRateDao;

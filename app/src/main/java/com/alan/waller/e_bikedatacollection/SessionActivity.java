@@ -27,7 +27,6 @@ public class SessionActivity extends AppCompatActivity {
     static String startDateString;
     static Long startTime;
     static Long endTime;
-    static Long sessionLength;
     static Session session;
 
     @Override
@@ -43,6 +42,8 @@ public class SessionActivity extends AppCompatActivity {
 
         Button startButton = (Button) findViewById(R.id.startButton);
         Button endButton = (Button) findViewById(R.id.stopButton);
+
+        final SessionRepository sessionRepository = new SessionRepository(this.getApplication());
 
         final SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 
@@ -60,9 +61,10 @@ public class SessionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 endTime = System.currentTimeMillis();
-                sessionLength = endTime - startTime;
-                session = new Session(subjectName, subjectAge, subjectHeight, subjectWeight, subjectSex, sessionLength, startDateString);
+                session = new Session(subjectName, subjectAge, subjectHeight, subjectWeight, subjectSex, startTime, endTime);
+                sessionRepository.insertSession(session);
                 Toast.makeText(SessionActivity.this, session.toString(), Toast.LENGTH_SHORT).show();
+
             }
         });
 
