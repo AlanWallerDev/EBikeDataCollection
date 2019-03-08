@@ -21,9 +21,6 @@ public interface HeartRateDao {
     @Query("SELECT * FROM HeartRate ORDER BY hid ASC")
     LiveData<List<HeartRate>> getAll();
 
-    @Query("SELECT * FROM HeartRate WHERE timestamp > :start AND timestamp < :end")
-    LiveData<List<GPSData>> getSessionHeartRateData(long start, long end);
-
     @Update
     void update(HeartRate heartRate);
 }

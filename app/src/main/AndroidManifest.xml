@@ -31,7 +31,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyClUUSd5xo-I3xSt4w6cWCXmppqDzWDxu4" />
 
-
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -75,6 +74,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".GPSTest">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".SessionDataDisplayActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

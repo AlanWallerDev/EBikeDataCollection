@@ -15,8 +15,6 @@ public interface SessionDao {
     @Query("SELECT * FROM Session ORDER BY sid ASC")
     LiveData<List<Session>> getAll();
 
-    @Query("SELECT * FROM Session WHERE")
-
     @Update
     void update(Session session);
 }
