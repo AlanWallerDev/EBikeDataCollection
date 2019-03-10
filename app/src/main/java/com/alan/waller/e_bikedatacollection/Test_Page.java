@@ -4,8 +4,22 @@ package com.alan.waller.e_bikedatacollection;
 
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -14,6 +28,10 @@ import com.google.android.gms.fitness.FitnessOptions;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.SensorRequest;
 
+import java.security.Permissions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -28,270 +46,126 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.fitness.request.DataSourcesRequest;
 import com.google.android.gms.fitness.request.OnDataPointListener;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import java.util.List;
 
-/**
- * This sample demonstrates how to use the Sensors API of the Google Fit platform to find available
- * data sources and to register/unregister listeners to those sources. It also demonstrates how to
- * authenticate a user with Google Play Services.
- */
+
 public class Test_Page extends AppCompatActivity {
 
     TextView hR;
     public static final String TAG = "BasicSensorsApi";
 
-    private static final int REQUEST_OAUTH_REQUEST_CODE = 1;
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
-    // [START mListener_variable_reference]
-    // Need to hold a reference to this listener, as it's passed into the "unregister"
-    // method in order to stop all sensors from sending data to this listener.
     private OnDataPointListener mListener;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothLeScanner bleScanner;
+    private BluetoothGatt bleGatt;
+    private int REQUEST_ENABLE_BT = 20;
+    //TODO:find our UUID
+    private UUID heatRateUUID = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
+    private final int MY_PERMISSION_ACCESS_COURSE = 99;
+    private final int MY_PERSMISSION_ACCESS_FINE = 98;
+    private ScanCallback scanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            //TODO: change this name to the watch name
+            if("Gopher".equals(result.getDevice().getName())) {
+                Toast.makeText(Test_Page.this, "Gopher found",
+                        Toast.LENGTH_SHORT).show();
+                if(bleScanner != null) {
+                    bleScanner.stopScan(scanCallback);
+                }
+                bleGatt =
+                        result.getDevice().connectGatt(
+                                getApplicationContext(), false, bleGattCallback);
+            }super.onScanResult(callbackType, result);
+        }
+    };
+
+
+    private BluetoothGattCallback bleGattCallback = new BluetoothGattCallback()
+    {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int
+                newState) {
+            gatt.discoverServices();
+            super.onConnectionStateChange(gatt, status, newState);
+        }
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            BluetoothGattService service =
+                    gatt.getService(heatRateUUID);
+            BluetoothGattCharacteristic temperatureCharacteristic =
+                    service.getCharacteristic(heatRateUUID);
+            gatt.readCharacteristic(temperatureCharacteristic);
+            super.onServicesDiscovered(gatt, status);
+        }
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, final
+        BluetoothGattCharacteristic characteristic, int status) {
+            final String value = characteristic.getStringValue(0);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    TextView tv;
+
+                    tv = (TextView) Test_Page.this.findViewById(
+                            R.id.heartRate);
+
+                    tv.setText(value);
+                }
+            });
+            BluetoothGattService service =
+                    gatt.getService(heatRateUUID);
+            //readNextCharacteristic(gatt, characteristic);
+            super.onCharacteristicRead(gatt, characteristic, status);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_COURSE);
+        }
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERSMISSION_ACCESS_FINE);
+        }
+
+
         setContentView(R.layout.test_page);
 
-        hR = findViewById(R.id.heartRate);
+        final BluetoothManager bluetoothManager =
+                (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
 
+        startScan();
 
-        // When permissions are revoked the app is restarted so onCreate is sufficient to check for
-        // permissions core to the Activity's functionality.
-        if (hasRuntimePermissions()) {
-            findFitnessDataSourcesWrapper();
-        } else {
-            requestRuntimePermissions();
+    }
+
+    private void startScan() {
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled())
+        {Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-    }
-
-    /**
-     * A wrapper for {@link #findFitnessDataSources}. If the user account has OAuth permission,
-     * continue to {@link #findFitnessDataSources}, else request OAuth permission for the account.
-     */
-    private void findFitnessDataSourcesWrapper() {
-        Log.i(TAG, "findFitnessDataSourcesWrapper called");
-        if (hasOAuthPermission()) {
-            findFitnessDataSources();
-        } else {
-            requestOAuthPermission();
-        }
-    }
-
-    /** Gets the {@link FitnessOptions} in order to check or request OAuth permission for the user. */
-    private FitnessOptions getFitnessSignInOptions() {
-        Log.i(TAG, "getFitnessSignInOptions calles");
-        return FitnessOptions.builder().addDataType(DataType.TYPE_HEART_RATE_BPM, FitnessOptions.ACCESS_READ).build();
-    }
-
-    /** Checks if user's account has OAuth permission to Fitness API. */
-    private boolean hasOAuthPermission() {
-        Log.i(TAG, "hasOAuthPermission called");
-        FitnessOptions fitnessOptions = getFitnessSignInOptions();
-        return GoogleSignIn.hasPermissions(GoogleSignIn.getLastSignedInAccount(this), fitnessOptions);
-    }
-
-    /** Launches the Google SignIn activity to request OAuth permission for the user. */
-    private void requestOAuthPermission() {
-        Log.i(TAG, "requestOAuthPermission called");
-        FitnessOptions fitnessOptions = getFitnessSignInOptions();
-        GoogleSignIn.requestPermissions(
-                this,
-                REQUEST_OAUTH_REQUEST_CODE,
-                GoogleSignIn.getLastSignedInAccount(this),
-                fitnessOptions);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // This ensures that if the user denies the permissions then uses Settings to re-enable
-        // them, the app will start working.
-        findFitnessDataSourcesWrapper();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "onActivityResult called");
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_OAUTH_REQUEST_CODE) {
-                findFitnessDataSources();
+        else {
+            bleScanner = bluetoothAdapter.getBluetoothLeScanner();
+            if (bleScanner != null) {
+                final ScanFilter scanFilter =new ScanFilter.Builder().build();
+                ScanSettings settings =new ScanSettings.Builder()
+                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+                bleScanner.startScan(Arrays.asList(scanFilter), settings, scanCallback);
             }
         }
     }
-    // [END auth_oncreate_setup]
-
-    /** Finds available data sources and attempts to register on a specific {@link DataType}. */
-    private void findFitnessDataSources() {
-        Log.i(TAG, "findFitnessDataSources called");
-        // [START find_data_sources]
-        // Note: Fitness.SensorsApi.findDataSources() requires the ACCESS_FINE_LOCATION permission.
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .findDataSources(
-                        new DataSourcesRequest.Builder()
-                                .setDataTypes(DataType.TYPE_HEART_RATE_BPM)
-                                .setDataSourceTypes(DataSource.TYPE_RAW)
-                                .build())
-                .addOnSuccessListener(
-                        new OnSuccessListener<List<DataSource>>() {
-                            @Override
-                            public void onSuccess(List<DataSource> dataSources) {
-                                Log.i(TAG, "Listener Success");
-                                Log.i(TAG, "DataSources: " + dataSources.size());
-                                for (DataSource dataSource : dataSources) {
-                                    Log.i(TAG, "Data source found: " + dataSource.toString());
-                                    Log.i(TAG, "Data Source type: " + dataSource.getDataType().getName());
-
-                                    // Let's register a listener to receive Activity data!
-                                    if (dataSource.getDataType().equals(DataType.TYPE_HEART_RATE_BPM)
-                                            && mListener == null) {
-                                        Log.i(TAG, "Data source for HEART RATE found!  Registering.");
-                                        registerFitnessDataListener(dataSource);
-                                    }
-                                }
-                            }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "failed", e);
-                            }
-                        });
-        // [END find_data_sources]
-    }
-
-    /**
-     * Registers a listener with the Sensors API for the provided {@link DataSource} and {@link
-     * DataType} combo.
-     */
-    private void registerFitnessDataListener(DataSource dataSource) {
-        Log.i(TAG, "registerFitnessDataListener called");
-        // [START register_data_listener]
-        mListener =
-                new OnDataPointListener() {
-                    @Override
-                    public void onDataPoint(DataPoint dataPoint) {
-                        for (final Field field : dataPoint.getDataType().getFields()) {
-                            final Value val = dataPoint.getValue(field);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    hR.setText(val.toString());
-                                }
-                            });
-                        }
-                    }
-                };
-
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .add(
-                        new SensorRequest.Builder()
-                                .setDataSource(dataSource) // Optional but recommended for custom data sets.
-                                .setDataType(DataType.TYPE_HEART_RATE_BPM) // Can't be omitted.
-                                .setSamplingRate(1, TimeUnit.SECONDS)
-                                .build(),
-                        mListener)
-                .addOnCompleteListener(
-                        new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.i(TAG, "Listener registered!");
-                                } else {
-                                    Log.e(TAG, "Listener not registered.", task.getException());
-                                }
-                            }
-                        });
-        // [END register_data_listener]
-    }
-
-    /** Unregisters the listener with the Sensors API. */
-    private void unregisterFitnessDataListener() {
-        Log.i(TAG, "unRegisterFitnessDataListener called");
-        if (mListener == null) {
-            // This code only activates one listener at a time.  If there's no listener, there's
-            // nothing to unregister.
-            return;
-        }
-
-        // [START unregister_data_listener]
-        // Waiting isn't actually necessary as the unregister call will complete regardless,
-        // even if called from within onStop, but a callback can still be added in order to
-        // inspect the results.
-        Fitness.getSensorsClient(this, GoogleSignIn.getLastSignedInAccount(this))
-                .remove(mListener)
-                .addOnCompleteListener(
-                        new OnCompleteListener<Boolean>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Boolean> task) {
-                                if (task.isSuccessful() && task.getResult()) {
-                                    Log.i(TAG, "Listener was removed!");
-                                } else {
-                                    Log.i(TAG, "Listener was not removed.");
-                                }
-                            }
-                        });
-        // [END unregister_data_listener]
-    }
 
 
-    /** Initializes a custom log class that outputs both to in-app targets and logcat. */
-
-    /** Returns the current state of the permissions needed. */
-    private boolean hasRuntimePermissions() {
-        Log.i(TAG, "hasRuntimePermissions called");
-        int permissionState =
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestRuntimePermissions() {
-        boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                        this, Manifest.permission.BODY_SENSORS);
-
-        if (shouldProvideRationale) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.");
-
-        } else {
-            Log.i(TAG, "Requesting permission");
-            // Request permission. It's possible this can be auto answered if device policy
-            // sets the permission in a given state or the user denied the permission
-            // previously and checked "Never ask again".
-            ActivityCompat.requestPermissions(
-                    Test_Page.this,
-                    new String[] {Manifest.permission.BODY_SENSORS},
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
-    }
-
-    /** Callback received when a permissions request has been completed. */
-    @Override
-    public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        Log.i(TAG, "onRequestPermissionResult called");
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length <= 0) {
-                // If user interaction was interrupted, the permission request is cancelled and you
-                // receive empty arrays.
-                Log.i(TAG, "User interaction was cancelled.");
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted.
-                findFitnessDataSourcesWrapper();
-            } else {
-                // Permission denied.
-                Log.i(TAG, "Permission denied");
-
-            }
-        }
-    }
 
 }
