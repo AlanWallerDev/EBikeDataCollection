@@ -1,5 +1,6 @@
 package com.alan.waller.e_bikedatacollection;
 
+import android.bluetooth.BluetoothClass;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         testPage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, Test_Page.class);
+                Intent intent = new Intent(MainActivity.this, DeviceScanActivity.class);
                 startActivity(intent);
             }
         });

@@ -229,9 +229,6 @@ public class DeviceServicesActivity extends Activity {
 
         demoButton.setVisibility(View.VISIBLE);
 
-        getActionBar().setTitle(deviceName);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         final Intent gattServiceIntent = new Intent(this, BleService.class);
         bindService(gattServiceIntent, serviceConnection, BIND_AUTO_CREATE);
     }
