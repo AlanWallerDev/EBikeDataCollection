@@ -20,6 +20,8 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 
@@ -190,7 +192,7 @@ public class DeviceServicesActivity extends Activity {
         gattServicesList.setAdapter((SimpleExpandableListAdapter) null);
         dataField.setText(R.string.no_data);
         heartRateField.setText(R.string.no_data);
-        intervalField.setText(R.string.no_data);
+/////////////////////////        intervalField.setText(R.string.no_data);
     }
 
     public void setServiceListener(BleServicesAdapter.OnServiceItemClickListener listener) {
@@ -311,28 +313,34 @@ public class DeviceServicesActivity extends Activity {
         final BluetoothGattCharacteristic characteristic = gattServiceAdapter
                 .getHeartRateCharacteristic();
         Log.d(TAG,"characteristic: " + characteristic);
-        final BleSensor<?> sensor = BleSensors.getSensor(characteristic
-                .getService()
-                .getUuid()
-                .toString());
+        try {
+            final BleSensor<?> sensor = BleSensors.getSensor(characteristic
+                    .getService()
+                    .getUuid()
+                    .toString());
 
-        if (heartRateSensor != null)
-            bleService.enableSensor(heartRateSensor, false);
+            if (heartRateSensor != null)
+                bleService.enableSensor(heartRateSensor, false);
 
-        if (sensor == null) {
-            bleService.readCharacteristic(characteristic);
-            return true;
+            if (sensor == null) {
+                bleService.readCharacteristic(characteristic);
+                return true;
+            }
+
+            if (sensor == heartRateSensor)
+                return true;
+
+            heartRateSensor = sensor;
+            bleService.enableSensor(sensor, true);
+
+            this.setServiceListener(demoClickListener);
+        }catch(NullPointerException e){
+            Log.d(TAG, "Null characteristic");
+            e.printStackTrace();
         }
 
-        if (sensor == heartRateSensor)
             return true;
 
-        heartRateSensor = sensor;
-        bleService.enableSensor(sensor, true);
-
-        this.setServiceListener(demoClickListener);
-
-        return true;
     }
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
