@@ -99,7 +99,11 @@ public class DeviceServicesActivity extends Activity {
             } else if (BleService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 displayGattServices(bleService.getSupportedGattServices());
-                enableHeartRateSensor();
+                try {
+                    enableHeartRateSensor();
+                }catch( Exception e){
+                    e.printStackTrace();
+                }
             } else if (BleService.ACTION_DATA_AVAILABLE.equals(action)) {
                 displayData(intent.getStringExtra(BleService.EXTRA_SERVICE_UUID), intent.getStringExtra(BleService.EXTRA_TEXT));
 
